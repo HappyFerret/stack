@@ -14,6 +14,13 @@ variable "zone_id" {
   description = "The Route53 Zone ID where the DNS record will be created"
 }
 
+variable "engine_version" {
+  description = "The DB engine version"
+  default = "5.6.27"
+}
+
+
+
 variable "security_groups" {
   description = "A list of security group IDs"
   type = "list"
@@ -110,7 +117,7 @@ resource "aws_db_subnet_group" "main" {
 resource "aws_db_instance" "main" {
   allocated_storage    = 5
   engine               = "mysql"
-  engine_version       = "5.6.17"
+  engine_version       = "${var.engine_version}"
   instance_class       = "${var.instance_type}"
   name                 = "${var.database_name}"
   username             = "${var.master_username}"
