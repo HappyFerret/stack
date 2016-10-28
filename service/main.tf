@@ -111,6 +111,10 @@ variable "zone_id" {
   description = "The zone ID to create the record in"
 }
 
+variable "deployment_maximum_percent" {
+  default = 100
+}
+
 /**
  * Resources.
  */
@@ -121,6 +125,7 @@ resource "aws_ecs_service" "main" {
   task_definition = "${module.task.arn}"
   desired_count   = "${var.desired_count}"
   iam_role        = "${var.iam_role}"
+  deployment_maximum_percent = "${var.deployment_maximum_percent}"
 
   load_balancer {
     elb_name       = "${module.elb.id}"
