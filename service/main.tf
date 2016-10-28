@@ -112,6 +112,10 @@ variable "zone_id" {
 }
 
 variable "deployment_maximum_percent" {
+  default = 200
+}
+
+variable "deployment_minimum_healthy_percent" {
   default = 100
 }
 
@@ -126,6 +130,7 @@ resource "aws_ecs_service" "main" {
   desired_count   = "${var.desired_count}"
   iam_role        = "${var.iam_role}"
   deployment_maximum_percent = "${var.deployment_maximum_percent}"
+  deployment_minimum_healthy_percent = "${var.deployment_minimum_healthy_percent}"
 
   load_balancer {
     elb_name       = "${module.elb.id}"
