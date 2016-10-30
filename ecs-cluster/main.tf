@@ -191,7 +191,7 @@ resource "aws_launch_configuration" "main" {
   }
 
   lifecycle {
-    create_before_destroy = false
+    create_before_destroy = true
   }
 }
 
