@@ -126,6 +126,7 @@ resource "aws_db_instance" "main" {
   db_subnet_group_name = "${aws_db_subnet_group.main.id}"
   parameter_group_name = "default.mysql5.6"
   vpc_security_group_ids  = ["${aws_security_group.main.id}"]
+  availability_zones      = ["${var.availability_zones}"]
 }
 
 # resource "aws_rds_cluster_instance" "cluster_instances" {
