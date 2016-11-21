@@ -156,7 +156,7 @@ resource "aws_route53_record" "main" {
   name    = "${coalesce(var.dns_name, var.name)}"
   type    = "CNAME"
   ttl     = 300
-  records = ["${aws_db_instance.main.endpoint}"]
+  records = ["${replace(aws_db_instance.main.endpoint, ":3306", "")}"]
 }
 
 // The cluster identifier.
