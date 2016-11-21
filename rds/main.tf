@@ -50,7 +50,7 @@ variable "master_password" {
 
 variable "instance_type" {
   description = "The type of instances that the RDS cluster will be running on"
-  default     = "db.r3.large"
+  default     = "db.t2.micro"
 }
 
 variable "instance_count" {
@@ -165,7 +165,7 @@ output "id" {
 }
 
 output "endpoint" {
-  value = "${aws_db_instance.main.endpoint}"
+  value = "${replace(aws_db_instance.main.endpoint, ':3306', '')}"
 }
 
 output "fqdn" {
