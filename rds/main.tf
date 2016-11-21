@@ -165,7 +165,7 @@ output "id" {
 }
 
 output "endpoint" {
-  value = "${replace(aws_db_instance.main.endpoint, \":3306\", \"\")}"
+  value = "${replace(aws_db_instance.main.endpoint, ":3306", "")}"
 }
 
 output "fqdn" {
