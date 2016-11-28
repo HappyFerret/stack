@@ -78,7 +78,7 @@ variable "ports" {
  */
 
 resource "aws_ecs_service" "main" {
-  name            = "${aws_ecs_task_definition.main.name}"
+  name            = "${var.name}"
   cluster         = "${var.cluster}"
   task_definition = "${aws_ecs_task_definition.main.arn}"
   desired_count   = "${var.desired_count}"
