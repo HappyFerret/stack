@@ -114,12 +114,12 @@ resource "aws_ecs_task_definition" "main" {
     "name": "${var.name}",
     "portMappings": ${var.ports},
     "entryPoint": [],
-    "mountPoints": [{
+    "mountPoints": [
        {
           "containerPath": "/tmp/docker.sock",
           "sourceVolume": "dockersock"
         }
-    }]
+    ]
   }
 ]
 EOF
