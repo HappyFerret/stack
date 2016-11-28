@@ -68,6 +68,11 @@ variable "cpu" {
   default     = 512
 }
 
+variable "ports" {
+  description = "The docker container ports"
+  default     = "[]"
+}
+
 /**
  * Resources.
  */
@@ -93,4 +98,5 @@ module "task" {
   env_vars      = "${var.env_vars}"
   memory        = "${var.memory}"
   cpu           = "${var.cpu}"
+  ports         = "${var.ports}"
 }
