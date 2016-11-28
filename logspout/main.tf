@@ -99,7 +99,7 @@ resource "aws_ecs_task_definition" "main" {
 
   volume = {
     name = "dockersock"
-    sourcePath = "/var/run/docker.sock"
+    host_path  = "/var/run/docker.sock"
   }
 
   container_definitions = <<EOF
