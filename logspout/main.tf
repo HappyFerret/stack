@@ -109,11 +109,11 @@ resource "aws_ecs_task_definition" "main" {
     "environment": ${var.env_vars},
     "essential": true,
     "command": ${var.command},
-    "image": "${var.image}:${var.image_version}",
+    "image": "${var.image}:latest",
     "memory": ${var.memory},
     "name": "${var.name}",
     "portMappings": ${var.ports},
-    "entryPoint": ${var.entry_point},
+    "entryPoint": "[]",
     "mountPoints": [{
        {
           "containerPath": "/tmp/docker.sock",
