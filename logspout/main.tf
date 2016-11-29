@@ -60,12 +60,12 @@ variable "desired_count" {
 
 variable "memory" {
   description = "The number of MiB of memory to reserve for the container"
-  default     = 512
+  default     = 128
 }
 
 variable "cpu" {
   description = "The number of cpu units to reserve for the container"
-  default     = 512
+  default     = 1
 }
 
 variable "ports" {
