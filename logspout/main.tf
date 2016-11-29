@@ -65,7 +65,7 @@ variable "memory" {
 
 variable "cpu" {
   description = "The number of cpu units to reserve for the container"
-  default     = 1
+  default     = 512
 }
 
 variable "ports" {
