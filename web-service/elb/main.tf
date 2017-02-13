@@ -75,13 +75,13 @@ resource "aws_elb" "main" {
     instance_protocol = "http"
   }
 
-  # listener {
-  #   lb_port            = 443
-  #   lb_protocol        = "https"
-  #   instance_port      = "${var.port}"
-  #   instance_protocol  = "http"
-  #   ssl_certificate_id = "${var.ssl_certificate_id}"
-  # }
+  listener {
+    lb_port            = 443
+    lb_protocol        = "https"
+    instance_port      = "${var.port}"
+    instance_protocol  = "http"
+    ssl_certificate_id = "${var.ssl_certificate_id}"
+  }
 
   health_check {
     healthy_threshold   = 2
