@@ -68,12 +68,13 @@ resource "aws_elb" "main" {
   connection_draining         = true
   connection_draining_timeout = 15
 
-  listener {
+  # No External HTTP
+  /*listener {
     lb_port           = 80
     lb_protocol       = "http"
     instance_port     = "${var.port}"
     instance_protocol = "http"
-  }
+  }*/
 
   listener {
     lb_port            = 443
