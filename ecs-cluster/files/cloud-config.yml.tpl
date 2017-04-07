@@ -8,5 +8,4 @@ bootcmd:
   - echo 'ECS_ENGINE_AUTH_TYPE=${docker_auth_type}' >> /etc/ecs/ecs.config
   - echo 'ECS_ENGINE_AUTH_DATA=${docker_auth_data}' >> /etc/ecs/ecs.config
   - echo 'ECS_CLUSTER=${name}' >> /etc/ecs/ecs.config
-  - echo 'ECS_AVAILABLE_LOGGING_DRIVERS=journald' >> /etc/ecs/ecs.config
-
+  - echo 'ECS_AVAILABLE_LOGGING_DRIVERS=\'["journald","awslogs"]\'' >> /etc/ecs/ecs.config

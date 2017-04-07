@@ -65,7 +65,7 @@ variable "memory" {
 
 variable "cpu" {
   description = "The number of cpu units to reserve for the container"
-  default     = 128 
+  default     = 128
 }
 
 variable "ports" {
@@ -82,6 +82,12 @@ resource "aws_ecs_service" "main" {
   cluster         = "${var.cluster}"
   task_definition = "${aws_ecs_task_definition.main.arn}"
   desired_count   = "${var.desired_count}"
+  deployment_minimum_healthy_percent = 0
+  deployment_maximum_percent = 100
+  
+  placement_strategy {
+    type = "distinctInstance"
+  }
 
   lifecycle {
     create_before_destroy = true
