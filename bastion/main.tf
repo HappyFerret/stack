@@ -50,6 +50,11 @@ variable "environment" {
   description = "Environment tag, e.g prod"
 }
 
+variable "user_data" {
+  description = "Custom User Data"
+  default     = ""
+}
+
 module "ami" {
   source        = "github.com/terraform-community-modules/tf_aws_ubuntu_ami/ebs"
   region        = "${var.region}"
@@ -65,7 +70,7 @@ resource "aws_instance" "bastion" {
   key_name               = "${var.key_name}"
   vpc_security_group_ids = ["${split(",",var.security_groups)}"]
   monitoring             = true
-  user_data              = "${file(format("%s/user_data.sh", path.module))}"
+  user_data              = "${var.user_data}"
 
   tags {
     Name        = "bastion"

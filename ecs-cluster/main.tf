@@ -116,6 +116,11 @@ variable "docker_auth_data" {
   default     = ""
 }
 
+variable "cloud_config_custom" {
+  description = "Cloud Config segment to inject"
+  default     = ""
+}
+
 resource "aws_security_group" "cluster" {
   name        = "${var.name}-ecs-cluster"
   vpc_id      = "${var.vpc_id}"
@@ -162,6 +167,7 @@ data "template_file" "cloud_config" {
     region           = "${var.region}"
     docker_auth_type = "${var.docker_auth_type}"
     docker_auth_data = "${var.docker_auth_data}"
+    custom           = "${var.cloud_config_custom}"
   }
 }
 

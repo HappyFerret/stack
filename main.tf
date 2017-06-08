@@ -129,6 +129,16 @@ variable "ecs_ami" {
   default     = ""
 }
 
+variable "bastion_user_data" {
+  description = "User Data for bastion"
+  default     = ""
+}
+
+variable "cloud_config_custom" {
+  description = "Custom section to inject into cloud config"
+  default     = ""
+}
+
 module "defaults" {
   source = "./defaults"
   region = "${var.region}"
@@ -162,6 +172,7 @@ module "bastion" {
   subnet_id       = "${element(module.vpc.external_subnets, 0)}"
   key_name        = "${var.key_name}"
   environment     = "${var.environment}"
+  user_data       = "${var.bastion_user_data}"
 }
 
 module "dhcp" {
@@ -204,6 +215,7 @@ module "ecs_cluster" {
   docker_auth_type       = "${var.ecs_docker_auth_type}"
   docker_auth_data       = "${var.ecs_docker_auth_data}"
   security_groups        = "${coalesce(var.ecs_security_groups, format("%s,%s,%s", module.security_groups.internal_ssh, module.security_groups.internal_elb, module.security_groups.external_elb))}"
+  cloud_config_custom    = "${var.cloud_config_custom}"
 }
 
 module "s3_logs" {
