@@ -100,3 +100,7 @@ module "task" {
   cpu           = "${var.cpu}"
   ports         = "${var.ports}"
 }
+
+output "arn" {
+  value = "${module.task.arn}"
+}
