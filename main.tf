@@ -285,6 +285,11 @@ output "cluster" {
   value = "${module.ecs_cluster.name}"
 }
 
+// The default ECS cluster name.
+output "cluster_arn" {
+  value = "${module.ecs_cluster.arn}"
+}
+
 // The VPC availability zones.
 output "availability_zones" {
   value = "${module.vpc.availability_zones}"
