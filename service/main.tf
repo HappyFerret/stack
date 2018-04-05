@@ -62,6 +62,11 @@ variable "log_bucket" {
 /**
  * Options.
  */
+     
+variable "launch_type" {
+  description = "Launch type (EC2 || Fargate)"
+  default     = ""
+}
 
 variable "healthcheck" {
   description = "Path to a healthcheck endpoint"
@@ -131,6 +136,7 @@ resource "aws_ecs_service" "main" {
   iam_role        = "${var.iam_role}"
   deployment_maximum_percent = "${var.deployment_maximum_percent}"
   deployment_minimum_healthy_percent = "${var.deployment_minimum_healthy_percent}"
+  launch_type = "${var.launch_type}"
 
   load_balancer {
     elb_name       = "${module.elb.id}"
