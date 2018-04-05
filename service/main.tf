@@ -136,7 +136,7 @@ resource "aws_ecs_service" "main" {
   iam_role        = "${var.iam_role}"
   deployment_maximum_percent = "${var.deployment_maximum_percent}"
   deployment_minimum_healthy_percent = "${var.deployment_minimum_healthy_percent}"
-  launch_type = ""
+  launch_type = "EC2"
 
   load_balancer {
     elb_name       = "${module.elb.id}"
@@ -146,6 +146,7 @@ resource "aws_ecs_service" "main" {
 
   lifecycle {
     create_before_destroy = true
+    ignore_changes = ["launch_type"]
   }
 }
 
