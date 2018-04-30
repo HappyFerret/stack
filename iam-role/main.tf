@@ -18,7 +18,8 @@ resource "aws_iam_role" "default_ecs_role" {
       "Principal": {
         "Service": [
           "ecs.amazonaws.com",
-          "ec2.amazonaws.com"
+          "ec2.amazonaws.com",
+          "ecs-tasks.amazonaws.com"
         ]
       },
       "Effect": "Allow"
