@@ -139,6 +139,11 @@ variable "cloud_config_custom" {
   default     = ""
 }
 
+variable "alarm_sns_topic" {
+  description = "The sns topic arn to notify in case a cloudwatch alarm triggers"
+  default     = ""
+}
+
 module "defaults" {
   source = "./defaults"
   region = "${var.region}"
@@ -216,6 +221,7 @@ module "ecs_cluster" {
   docker_auth_data       = "${var.ecs_docker_auth_data}"
   security_groups        = "${coalesce(var.ecs_security_groups, format("%s,%s,%s", module.security_groups.internal_ssh, module.security_groups.internal_elb, module.security_groups.external_elb))}"
   cloud_config_custom    = "${var.cloud_config_custom}"
+  alarm_sns_topic        = "${var.alarm_sns_topic}"
 }
 
 module "s3_logs" {

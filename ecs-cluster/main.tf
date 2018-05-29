@@ -93,7 +93,7 @@ variable "desired_capacity" {
 
 variable "associate_public_ip_address" {
   description = "Should created instances be publicly accessible (if the SG allows)"
-  default = false
+  default     = false
 }
 
 variable "root_volume_size" {
@@ -120,6 +120,8 @@ variable "cloud_config_custom" {
   description = "Cloud Config segment to inject"
   default     = ""
 }
+
+variable "alarm_sns_topic" {}
 
 resource "aws_security_group" "cluster" {
   name        = "${var.name}-ecs-cluster"
@@ -274,7 +276,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_high" {
   }
 
   alarm_description = "Scale up if the cpu reservation is above 90% for 10 minutes"
-  alarm_actions     = ["${aws_autoscaling_policy.scale_up.arn}"]
+  alarm_actions     = ["${aws_autoscaling_policy.scale_up.arn}", "${var.alarm_sns_topic}"]
 
   lifecycle {
     create_before_destroy = true
@@ -296,7 +298,7 @@ resource "aws_cloudwatch_metric_alarm" "memory_high" {
   }
 
   alarm_description = "Scale up if the memory reservation is above 90% for 10 minutes"
-  alarm_actions     = ["${aws_autoscaling_policy.scale_up.arn}"]
+  alarm_actions     = ["${aws_autoscaling_policy.scale_up.arn}", "${var.alarm_sns_topic}"]
 
   lifecycle {
     create_before_destroy = true
@@ -322,7 +324,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_low" {
   }
 
   alarm_description = "Scale down if the cpu reservation is below 10% for 10 minutes"
-  alarm_actions     = ["${aws_autoscaling_policy.scale_down.arn}"]
+  alarm_actions     = ["${aws_autoscaling_policy.scale_down.arn}", "${var.alarm_sns_topic}"]
 
   lifecycle {
     create_before_destroy = true
@@ -348,7 +350,7 @@ resource "aws_cloudwatch_metric_alarm" "memory_low" {
   }
 
   alarm_description = "Scale down if the memory reservation is below 10% for 10 minutes"
-  alarm_actions     = ["${aws_autoscaling_policy.scale_down.arn}"]
+  alarm_actions     = ["${aws_autoscaling_policy.scale_down.arn}", "${var.alarm_sns_topic}"]
 
   lifecycle {
     create_before_destroy = true
