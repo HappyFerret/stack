@@ -337,3 +337,7 @@ output "iam_instance_profile" {
 output "ecs_cluster_launch_configuration_user_data" {
   value = "${module.ecs_cluster.launch_configuration_user_data}"
 }
+
+output "name" {
+  value = "${var.name}"
+}
