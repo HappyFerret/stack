@@ -375,3 +375,7 @@ output "arn" {
 output "security_group_id" {
   value = "${aws_security_group.cluster.id}"
 }
+
+output "launch_configuration_user_data" {
+  value = "${data.template_file.cloud_config.rendered}"
+}

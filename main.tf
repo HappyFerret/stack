@@ -333,3 +333,7 @@ output "cidr" {
 output "iam_instance_profile" {
   value = "${module.iam_role.profile}"
 }
+
+output "ecs_cluster_launch_configuration_user_data" {
+  value = "${module.ecs_cluster.launch_configuration_user_data}"
+}
