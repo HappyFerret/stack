@@ -49,7 +49,8 @@ resource "aws_iam_role_policy" "default_ecs_service_role_policy" {
         "elasticloadbalancing:RegisterTargets",
         "sqs:SendMessage",
         "sqs:ReceiveMessage",
-        "sqs:DeleteMessage"
+        "sqs:DeleteMessage",
+        "s3:PutObject"
       ],
       "Resource": "*"
     }
