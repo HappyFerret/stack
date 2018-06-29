@@ -46,7 +46,10 @@ resource "aws_iam_role_policy" "default_ecs_service_role_policy" {
         "elasticloadbalancing:DeregisterTargets",
         "elasticloadbalancing:Describe*",
         "elasticloadbalancing:RegisterInstancesWithLoadBalancer",
-        "elasticloadbalancing:RegisterTargets"
+        "elasticloadbalancing:RegisterTargets",
+        "sqs:SendMessage",
+        "sqs:ReceiveMessage",
+        "sqs:DeleteMessage"
       ],
       "Resource": "*"
     }
