@@ -64,6 +64,7 @@ resource "aws_instance" "bastion" {
   vpc_security_group_ids = ["${split(",",var.security_groups)}"]
   monitoring             = true
   user_data              = "${var.user_data}"
+  iam_instance_profile = "${aws_iam_instance_profile.default_bastion_role.id}"
 
   tags {
     Name        = "bastion"
@@ -74,6 +75,16 @@ resource "aws_instance" "bastion" {
 resource "aws_eip" "bastion" {
   instance = "${aws_instance.bastion.id}"
   vpc      = true
+}
+
+resource "aws_iam_instance_profile" "default_bastion_role" {
+  name  = "bastion-instance-profile-${var.environment}"
+  path  = "/"
+  roles = ["${aws_iam_role.default_bastion_role.name}"]
+}
+
+resource "aws_iam_role" "default_bastion_role" {
+  name = "bastion-role-${var.environment}"
 }
 
 // Bastion external IP address.
