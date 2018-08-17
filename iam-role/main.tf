@@ -84,7 +84,8 @@ resource "aws_iam_role_policy" "default_ecs_instance_role_policy" {
         "ecr:GetDownloadUrlForLayer",
         "ecr:BatchGetImage",
         "ecs:StartTask",
-        "autoscaling:*"
+        "autoscaling:*",
+        "secretsmanager:GetSecretValue"
       ],
       "Resource": "*"
     },
