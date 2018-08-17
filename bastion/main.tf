@@ -85,6 +85,22 @@ resource "aws_iam_instance_profile" "default_bastion_role" {
 
 resource "aws_iam_role" "default_bastion_role" {
   name = "bastion-role-${var.environment}"
+  assume_role_policy = <<EOF
+{
+  "Version": "2008-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": [
+          "ec2.amazonaws.com"
+        ]
+      },
+      "Effect": "Allow"
+    }
+  ]
+}
+EOF
 }
 
 // Bastion external IP address.
