@@ -55,15 +55,8 @@ variable "user_data" {
   default     = ""
 }
 
-module "ami" {
-  source        = "github.com/terraform-community-modules/tf_aws_ubuntu_ami/ebs"
-  region        = "${var.region}"
-  distribution  = "trusty"
-  instance_type = "${var.instance_type}"
-}
-
 resource "aws_instance" "bastion" {
-  ami                    = "${module.ami.ami_id}"
+  ami                    = "ami-047bb4163c506cd98"
   source_dest_check      = false
   instance_type          = "${var.instance_type}"
   subnet_id              = "${var.subnet_id}"
