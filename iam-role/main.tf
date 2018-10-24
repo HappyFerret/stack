@@ -50,6 +50,10 @@ resource "aws_iam_role_policy" "default_ecs_service_role_policy" {
         "sqs:SendMessage",
         "sqs:ReceiveMessage",
         "sqs:DeleteMessage",
+        "sns:ListTopics",
+        "sns:Unsubscribe",
+        "sns:Publish",
+        "sns:Subscribe",
         "s3:PutObject",
         "s3:Get*",
         "s3:List*"
