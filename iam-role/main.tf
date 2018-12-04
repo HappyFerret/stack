@@ -56,7 +56,14 @@ resource "aws_iam_role_policy" "default_ecs_service_role_policy" {
         "sns:Subscribe",
         "s3:PutObject",
         "s3:Get*",
-        "s3:List*"
+        "s3:List*",
+        "dynamodb:PutItem",
+        "dynamodb:ListTables",
+        "dynamodb:DeleteItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:DescribeTable",
+        "dynamodb:GetItem",
+        "dynamodb:CreateTable"
       ],
       "Resource": "*"
     }
