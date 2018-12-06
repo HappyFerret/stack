@@ -191,6 +191,7 @@ module "dns" {
   source = "./dns"
   name   = "${var.domain_name}"
   vpc_id = "${module.vpc.id}"
+  region = "${var.region}"
 }
 
 module "iam_role" {

@@ -22,9 +22,17 @@ variable "vpc_id" {
   default     = ""
 }
 
+variable "region" {
+  default = "eu-west-1"
+}
+
+
 resource "aws_route53_zone" "main" {
   name    = "${var.name}"
-  vpc  = "${var.vpc_id}"
+  vpc {
+    vpc_id  = "${var.vpc_id}"
+    vpc_region = "${var.region}"
+  }
   comment = ""
 }
 
