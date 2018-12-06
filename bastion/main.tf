@@ -80,7 +80,7 @@ resource "aws_eip" "bastion" {
 resource "aws_iam_instance_profile" "default_bastion_role" {
   name  = "bastion-instance-profile-${var.environment}"
   path  = "/"
-  roles = ["${aws_iam_role.default_bastion_role.name}"]
+  role = "${aws_iam_role.default_bastion_role.name}"
 }
 
 resource "aws_iam_role" "default_bastion_role" {
