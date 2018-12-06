@@ -62,7 +62,7 @@ variable "availability_zones" {
 
 variable "bastion_instance_type" {
   description = "Instance type for the bastion"
-  default     = "t2.micro"
+  default     = "t3.micro"
 }
 
 variable "ecs_cluster_name" {
