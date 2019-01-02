@@ -191,13 +191,6 @@ resource "aws_launch_configuration" "main" {
     volume_size = "${var.root_volume_size}"
   }
 
-  # docker
-  ebs_block_device {
-    device_name = "/dev/xvdcz"
-    volume_type = "gp2"
-    volume_size = "${var.docker_volume_size}"
-  }
-
   lifecycle {
     create_before_destroy = true
   }
