@@ -101,12 +101,7 @@ variable "ecs_desired_capacity" {
 
 variable "ecs_root_volume_size" {
   description = "the size of the ecs instance root volume"
-  default     = 25
-}
-
-variable "ecs_docker_volume_size" {
-  description = "the size of the ecs instance docker volume"
-  default     = 25
+  default     = 30
 }
 
 variable "ecs_docker_auth_type" {
@@ -217,7 +212,6 @@ module "ecs_cluster" {
   region                 = "${var.region}"
   availability_zones     = "${module.vpc.availability_zones}"
   root_volume_size       = "${var.ecs_root_volume_size}"
-  docker_volume_size     = "${var.ecs_docker_volume_size}"
   docker_auth_type       = "${var.ecs_docker_auth_type}"
   docker_auth_data       = "${var.ecs_docker_auth_data}"
   security_groups        = "${coalesce(var.ecs_security_groups, format("%s,%s,%s", module.security_groups.internal_ssh, module.security_groups.internal_elb, module.security_groups.external_elb))}"

@@ -101,11 +101,6 @@ variable "root_volume_size" {
   default     = 25
 }
 
-variable "docker_volume_size" {
-  description = "Attached EBS volume size in GB"
-  default     = 25
-}
-
 variable "docker_auth_type" {
   description = "The docker auth type, see https://godoc.org/github.com/aws/amazon-ecs-agent/agent/engine/dockerauth for the possible values"
   default     = ""
