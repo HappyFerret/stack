@@ -96,16 +96,6 @@ variable "associate_public_ip_address" {
   default     = false
 }
 
-variable "root_volume_size" {
-  description = "Root volume size in GB"
-  default     = 25
-}
-
-variable "docker_volume_size" {
-  description = "Attached EBS volume size in GB"
-  default     = 25
-}
-
 variable "docker_auth_type" {
   description = "The docker auth type, see https://godoc.org/github.com/aws/amazon-ecs-agent/agent/engine/dockerauth for the possible values"
   default     = ""
@@ -184,19 +174,6 @@ resource "aws_launch_configuration" "main" {
   security_groups             = ["${aws_security_group.cluster.id}"]
   user_data                   = "${data.template_file.cloud_config.rendered}"
   associate_public_ip_address = "${var.associate_public_ip_address}"
-
-  # root
-  root_block_device {
-    volume_type = "gp2"
-    volume_size = "${var.root_volume_size}"
-  }
-
-  # docker
-  ebs_block_device {
-    device_name = "/dev/xvdcz"
-    volume_type = "gp2"
-    volume_size = "${var.docker_volume_size}"
-  }
 
   lifecycle {
     create_before_destroy = true
