@@ -56,7 +56,7 @@ variable "user_data" {
 }
 
 resource "aws_instance" "bastion" {
-  ami                    = "ami-047bb4163c506cd98"
+  ami                    = "ami-09693313102a30b2c"
   source_dest_check      = false
   instance_type          = "${var.instance_type}"
   subnet_id              = "${var.subnet_id}"
