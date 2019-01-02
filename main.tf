@@ -101,12 +101,12 @@ variable "ecs_desired_capacity" {
 
 variable "ecs_root_volume_size" {
   description = "the size of the ecs instance root volume"
-  default     = 25
+  default     = 8
 }
 
 variable "ecs_docker_volume_size" {
   description = "the size of the ecs instance docker volume"
-  default     = 25
+  default     = 40
 }
 
 variable "ecs_docker_auth_type" {
