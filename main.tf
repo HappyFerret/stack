@@ -208,7 +208,7 @@ module "ecs_cluster" {
   availability_zones     = "${module.vpc.availability_zones}"
   docker_auth_type       = "${var.ecs_docker_auth_type}"
   docker_auth_data       = "${var.ecs_docker_auth_data}"
-  security_groups        = "${concat(var.ecs_security_groups, list(module.security_groups.internal_sshm, module.security_groups.internal_elb, module.security_groups.external_elb))}"
+  security_groups        = "${concat(var.ecs_security_groups, list(module.security_groups.internal_ssh, module.security_groups.internal_elb, module.security_groups.external_elb))}"
   cloud_config_custom    = "${var.cloud_config_custom}"
   alarm_sns_topic        = "${var.alarm_sns_topic}"
 }
