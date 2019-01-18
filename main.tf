@@ -110,8 +110,9 @@ variable "ecs_docker_auth_data" {
 }
 
 variable "ecs_security_groups" {
-  description = "A comma separated list of security groups from which ingest traffic will be allowed on the ECS cluster, it defaults to allowing ingress traffic on port 22 and coming grom the ELBs"
-  default     = ""
+  description = "A list of security groups from which ingest traffic will be allowed on the ECS cluster, it defaults to allowing ingress traffic on port 22 and coming grom the ELBs"
+  default     = []
+  type = "list"
 }
 
 variable "ecs_ami" {
