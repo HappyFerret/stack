@@ -179,6 +179,10 @@ resource "aws_launch_configuration" "main" {
   lifecycle {
     create_before_destroy = true
   }
+
+  root_block_device {
+    volume_size = 60
+  }
 }
 
 resource "aws_autoscaling_group" "main" {
