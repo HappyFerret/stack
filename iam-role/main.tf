@@ -63,6 +63,7 @@ resource "aws_iam_role_policy" "default_ecs_service_role_policy" {
         "dynamodb:UpdateItem",
         "dynamodb:DescribeTable",
         "dynamodb:GetItem",
+        "dynamodb:Query",
         "dynamodb:CreateTable",
         "kms:Decrypt",
         "kms:DescribeKey",
