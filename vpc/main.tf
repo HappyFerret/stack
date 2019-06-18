@@ -154,12 +154,12 @@ output "id" {
 
 // A comma-separated list of subnet IDs.
 output "external_subnets" {
-  value = [aws_subnet.external.*.id]
+  value = flatten([aws_subnet.external.*.id])
 }
 
 // A list of subnet IDs.
 output "internal_subnets" {
-  value = [aws_subnet.internal.*.id]
+  value = flatten([aws_subnet.internal.*.id])
 }
 
 // The default VPC security group ID.
@@ -169,7 +169,7 @@ output "security_group" {
 
 // The list of availability zones of the VPC.
 output "availability_zones" {
-  value = [aws_subnet.external.*.availability_zone]
+  value = flatten([aws_subnet.external.*.availability_zone])
 }
 
 // The internal route table ID.
