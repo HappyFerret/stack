@@ -79,7 +79,7 @@ resource "aws_elb" "main" {
     bucket = "${var.log_bucket}"
   }
 
-  tags {
+  tags = {
     Name        = "${var.name}-balancer"
     Service     = "${var.name}"
     Environment = "${var.environment}"

@@ -133,7 +133,7 @@ resource "aws_security_group" "cluster" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags {
+  tags = {
     Name        = "ECS cluster (${var.name})"
     Environment = "${var.environment}"
   }
@@ -154,7 +154,7 @@ resource "aws_ecs_cluster" "main" {
 data "template_file" "cloud_config" {
   template = "${file("${path.module}/files/cloud-config.yml.tpl")}"
 
-  vars {
+  vars = {
     environment      = "${var.environment}"
     name             = "${var.name}"
     region           = "${var.region}"

@@ -102,7 +102,7 @@ resource "aws_security_group" "main" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags {
+  tags = {
     Name        = "RDS (${var.name})"
     Environment = "${var.environment}"
   }

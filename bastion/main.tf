@@ -66,7 +66,7 @@ resource "aws_instance" "bastion" {
   user_data              = "${var.user_data}"
   iam_instance_profile = "${aws_iam_instance_profile.default_bastion_role.id}"
 
-  tags {
+  tags = {
     Name        = "bastion"
     Environment = "${var.environment}"
   }

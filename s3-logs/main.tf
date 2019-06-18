@@ -20,7 +20,7 @@ resource "aws_s3_bucket" "logs" {
   bucket = "${var.name}-${var.environment}-logs"
   force_destroy = true
 
-  tags {
+  tags = {
     Name        = "${var.name}-${var.environment}-logs"
     Environment = "${var.environment}"
   }
