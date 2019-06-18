@@ -26,27 +26,27 @@ variable "region" {
   default = "eu-west-1"
 }
 
-
 resource "aws_route53_zone" "main" {
-  name    = "${var.name}"
+  name = var.name
   vpc {
-    vpc_id  = "${var.vpc_id}"
-    vpc_region = "${var.region}"
+    vpc_id     = var.vpc_id
+    vpc_region = var.region
   }
   comment = ""
 }
 
 // The domain name.
 output "name" {
-  value = "${var.name}"
+  value = var.name
 }
 
 // The zone ID.
 output "zone_id" {
-  value = "${aws_route53_zone.main.zone_id}"
+  value = aws_route53_zone.main.zone_id
 }
 
 // A comma separated list of the zone name servers.
 output "name_servers" {
-  value = "${join(",",aws_route53_zone.main.name_servers)}"
+  value = join(",", aws_route53_zone.main.name_servers)
 }
+

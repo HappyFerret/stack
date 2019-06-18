@@ -78,10 +78,10 @@ variable "ports" {
  */
 
 resource "aws_ecs_service" "main" {
-  name            = "${module.task.name}"
-  cluster         = "${var.cluster}"
-  task_definition = "${module.task.arn}"
-  desired_count   = "${var.desired_count}"
+  name            = module.task.name
+  cluster         = var.cluster
+  task_definition = module.task.arn
+  desired_count   = var.desired_count
 
   lifecycle {
     create_before_destroy = true
@@ -91,16 +91,17 @@ resource "aws_ecs_service" "main" {
 module "task" {
   source = "../task"
 
-  name          = "${coalesce(var.name, var.image)}"
-  image         = "${var.image}"
-  image_version = "${var.version}"
-  command       = "${var.command}"
-  env_vars      = "${var.env_vars}"
-  memory        = "${var.memory}"
-  cpu           = "${var.cpu}"
-  ports         = "${var.ports}"
+  name          = coalesce(var.name, var.image)
+  image         = var.image
+  image_version = var.version
+  command       = var.command
+  env_vars      = var.env_vars
+  memory        = var.memory
+  cpu           = var.cpu
+  ports         = var.ports
 }
 
 output "arn" {
-  value = "${module.task.arn}"
+  value = module.task.arn
 }
+

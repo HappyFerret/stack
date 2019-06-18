@@ -58,33 +58,33 @@ variable "user_data" {
 resource "aws_instance" "bastion" {
   ami                    = "ami-09693313102a30b2c"
   source_dest_check      = false
-  instance_type          = "${var.instance_type}"
-  subnet_id              = "${var.subnet_id}"
-  key_name               = "${var.key_name}"
-  vpc_security_group_ids = ["${split(",",var.security_groups)}"]
+  instance_type          = var.instance_type
+  subnet_id              = var.subnet_id
+  key_name               = var.key_name
+  vpc_security_group_ids = split(",", var.security_groups)
   monitoring             = true
-  user_data              = "${var.user_data}"
-  iam_instance_profile = "${aws_iam_instance_profile.default_bastion_role.id}"
+  user_data              = var.user_data
+  iam_instance_profile   = aws_iam_instance_profile.default_bastion_role.id
 
   tags = {
     Name        = "bastion"
-    Environment = "${var.environment}"
+    Environment = var.environment
   }
 }
 
 resource "aws_eip" "bastion" {
-  instance = "${aws_instance.bastion.id}"
+  instance = aws_instance.bastion.id
   vpc      = true
 }
 
 resource "aws_iam_instance_profile" "default_bastion_role" {
-  name  = "bastion-instance-profile-${var.environment}"
-  path  = "/"
-  role = "${aws_iam_role.default_bastion_role.name}"
+  name = "bastion-instance-profile-${var.environment}"
+  path = "/"
+  role = aws_iam_role.default_bastion_role.name
 }
 
 resource "aws_iam_role" "default_bastion_role" {
-  name = "bastion-role-${var.environment}"
+  name               = "bastion-role-${var.environment}"
   assume_role_policy = <<EOF
 {
   "Version": "2008-10-17",
@@ -101,9 +101,11 @@ resource "aws_iam_role" "default_bastion_role" {
   ]
 }
 EOF
+
 }
 
 // Bastion external IP address.
 output "external_ip" {
-  value = "${aws_eip.bastion.public_ip}"
+  value = aws_eip.bastion.public_ip
 }
+

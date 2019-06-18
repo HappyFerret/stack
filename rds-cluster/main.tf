@@ -16,17 +16,17 @@ variable "zone_id" {
 
 variable "security_groups" {
   description = "A list of security group IDs"
-  type = "list"
+  type        = list(string)
 }
 
 variable "subnet_ids" {
   description = "A list of subnet IDs"
-  type = "list"
+  type        = list(string)
 }
 
 variable "availability_zones" {
   description = "A list of availability zones"
-  type = "list"
+  type        = list(string)
 }
 
 variable "database_name" {
@@ -79,13 +79,13 @@ variable "port" {
 resource "aws_security_group" "main" {
   name        = "${var.name}-rds-cluster"
   description = "Allows traffic to rds from other security groups"
-  vpc_id      = "${var.vpc_id}"
+  vpc_id      = var.vpc_id
 
   ingress {
-    from_port       = "${var.port}"
-    to_port         = "${var.port}"
+    from_port       = var.port
+    to_port         = var.port
     protocol        = "TCP"
-    security_groups = ["${var.security_groups}"]
+    security_groups = var.security_groups
   }
 
   egress {
@@ -97,59 +97,60 @@ resource "aws_security_group" "main" {
 
   tags = {
     Name        = "RDS cluster (${var.name})"
-    Environment = "${var.environment}"
+    Environment = var.environment
   }
 }
 
 resource "aws_db_subnet_group" "main" {
-  name        = "${var.name}"
+  name        = var.name
   description = "RDS cluster subnet group"
-  subnet_ids  = ["${var.subnet_ids}"]
+  subnet_ids  = var.subnet_ids
 }
 
 resource "aws_rds_cluster_instance" "cluster_instances" {
-  count                = "${var.instance_count}"
+  count                = var.instance_count
   identifier           = "${var.name}-${count.index}"
-  db_subnet_group_name = "${aws_db_subnet_group.main.id}"
-  cluster_identifier   = "${aws_rds_cluster.main.id}"
-  publicly_accessible  = "${var.publicly_accessible}"
-  instance_class       = "${var.instance_type}"
+  db_subnet_group_name = aws_db_subnet_group.main.id
+  cluster_identifier   = aws_rds_cluster.main.id
+  publicly_accessible  = var.publicly_accessible
+  instance_class       = var.instance_type
 }
 
 resource "aws_rds_cluster" "main" {
-  cluster_identifier      = "${var.name}"
-  availability_zones      = ["${var.availability_zones}"]
-  database_name           = "${var.database_name}"
-  master_username         = "${var.master_username}"
-  master_password         = "${var.master_password}"
-  backup_retention_period = "${var.backup_retention_period}"
-  preferred_backup_window = "${var.preferred_backup_window}"
-  vpc_security_group_ids  = ["${aws_security_group.main.id}"]
-  db_subnet_group_name    = "${aws_db_subnet_group.main.id}"
-  port                    = "${var.port}"
+  cluster_identifier      = var.name
+  availability_zones      = var.availability_zones
+  database_name           = var.database_name
+  master_username         = var.master_username
+  master_password         = var.master_password
+  backup_retention_period = var.backup_retention_period
+  preferred_backup_window = var.preferred_backup_window
+  vpc_security_group_ids  = [aws_security_group.main.id]
+  db_subnet_group_name    = aws_db_subnet_group.main.id
+  port                    = var.port
 }
 
 resource "aws_route53_record" "main" {
-  zone_id = "${var.zone_id}"
-  name    = "${coalesce(var.dns_name, var.name)}"
+  zone_id = var.zone_id
+  name    = coalesce(var.dns_name, var.name)
   type    = "CNAME"
   ttl     = 300
-  records = ["${aws_rds_cluster.main.endpoint}"]
+  records = [aws_rds_cluster.main.endpoint]
 }
 
 // The cluster identifier.
 output "id" {
-  value = "${aws_rds_cluster.main.id}"
+  value = aws_rds_cluster.main.id
 }
 
 output "endpoint" {
-  value = "${aws_rds_cluster.main.endpoint}"
+  value = aws_rds_cluster.main.endpoint
 }
 
 output "fqdn" {
-  value = "${aws_route53_record.main.fqdn}"
+  value = aws_route53_record.main.fqdn
 }
 
 output "port" {
-  value = "${aws_rds_cluster.main.port}"
+  value = aws_rds_cluster.main.port
 }
+

@@ -32,15 +32,15 @@ variable "cpu" {
   default     = 512
 }
 
-variable "env_vars" {
+variable "env_vars" { # [{ "name": name, "value": value }]
   description = "The raw json of the task env vars"
   default     = "[]"
-} # [{ "name": name, "value": value }]
+}
 
-variable "command" {
+variable "command" { # ["--key=foo","--port=bar"]
   description = "The raw json of the task command"
   default     = "[]"
-} # ["--key=foo","--port=bar"]
+}
 
 variable "entry_point" {
   description = "The docker container entry point"
@@ -69,10 +69,10 @@ variable "memory" {
 # The ECS task definition.
 
 resource "aws_ecs_task_definition" "main" {
-  family = "${var.name}"
+  family = var.name
 
   lifecycle {
-    ignore_changes        = ["image"]
+    ignore_changes        = [image]
     create_before_destroy = true
   }
 
@@ -92,6 +92,7 @@ resource "aws_ecs_task_definition" "main" {
   }
 ]
 EOF
+
 }
 
 /**
@@ -100,10 +101,11 @@ EOF
 
 // The created task definition name
 output "name" {
-  value = "${aws_ecs_task_definition.main.family}"
+  value = aws_ecs_task_definition.main.family
 }
 
 // The created task definition ARN
 output "arn" {
-  value = "${aws_ecs_task_definition.main.arn}"
+  value = aws_ecs_task_definition.main.arn
 }
+

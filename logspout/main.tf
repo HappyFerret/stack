@@ -78,13 +78,13 @@ variable "ports" {
  */
 
 resource "aws_ecs_service" "main" {
-  name            = "${var.name}"
-  cluster         = "${var.cluster}"
-  task_definition = "${aws_ecs_task_definition.main.arn}"
-  desired_count   = "${var.desired_count}"
+  name                               = var.name
+  cluster                            = var.cluster
+  task_definition                    = aws_ecs_task_definition.main.arn
+  desired_count                      = var.desired_count
   deployment_minimum_healthy_percent = 0
-  deployment_maximum_percent = 100
-  
+  deployment_maximum_percent         = 100
+
   placement_strategy {
     type = "distinctInstance"
   }
@@ -94,18 +94,17 @@ resource "aws_ecs_service" "main" {
   }
 }
 
-
 resource "aws_ecs_task_definition" "main" {
-  family = "${var.name}"
+  family = var.name
 
   lifecycle {
-    ignore_changes        = ["image"]
+    ignore_changes        = [image]
     create_before_destroy = true
   }
 
-  volume = {
-    name = "dockersock"
-    host_path  = "/var/run/docker.sock"
+  volume {
+    name      = "dockersock"
+    host_path = "/var/run/docker.sock"
   }
 
   container_definitions = <<EOF
@@ -129,4 +128,6 @@ resource "aws_ecs_task_definition" "main" {
   }
 ]
 EOF
+
 }
+

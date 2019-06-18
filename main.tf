@@ -112,7 +112,7 @@ variable "ecs_docker_auth_data" {
 variable "ecs_security_groups" {
   description = "A list of security groups from which ingest traffic will be allowed on the ECS cluster, it defaults to allowing ingress traffic on port 22 and coming grom the ELBs"
   default     = []
-  type = "list"
+  type        = list(string)
 }
 
 variable "ecs_ami" {
@@ -137,197 +137,205 @@ variable "alarm_sns_topic" {
 
 module "defaults" {
   source = "./defaults"
-  region = "${var.region}"
-  cidr   = "${var.cidr}"
+  region = var.region
+  cidr   = var.cidr
 }
 
 module "vpc" {
   source             = "./vpc"
-  name               = "${var.name}"
-  cidr               = "${var.cidr}"
-  internal_subnets   = "${var.internal_subnets}"
-  external_subnets   = "${var.external_subnets}"
-  availability_zones = "${var.availability_zones}"
-  environment        = "${var.environment}"
+  name               = var.name
+  cidr               = var.cidr
+  internal_subnets   = var.internal_subnets
+  external_subnets   = var.external_subnets
+  availability_zones = var.availability_zones
+  environment        = var.environment
 }
 
 module "security_groups" {
   source      = "./security-groups"
-  name        = "${var.name}"
-  vpc_id      = "${module.vpc.id}"
-  environment = "${var.environment}"
-  cidr        = "${var.cidr}"
+  name        = var.name
+  vpc_id      = module.vpc.id
+  environment = var.environment
+  cidr        = var.cidr
 }
 
 module "bastion" {
   source          = "./bastion"
-  region          = "${var.region}"
-  instance_type   = "${var.bastion_instance_type}"
+  region          = var.region
+  instance_type   = var.bastion_instance_type
   security_groups = "${module.security_groups.external_ssh},${module.security_groups.internal_ssh}"
-  vpc_id          = "${module.vpc.id}"
-  subnet_id       = "${element(module.vpc.external_subnets, 0)}"
-  key_name        = "${var.key_name}"
-  environment     = "${var.environment}"
-  user_data       = "${var.bastion_user_data}"
+  vpc_id          = module.vpc.id
+  subnet_id       = element(module.vpc.external_subnets, 0)
+  key_name        = var.key_name
+  environment     = var.environment
+  user_data       = var.bastion_user_data
 }
 
 module "dhcp" {
   source  = "./dhcp"
-  name    = "${module.dns.name}"
-  vpc_id  = "${module.vpc.id}"
-  servers = "${coalesce(var.domain_name_servers, module.defaults.domain_name_servers)}"
+  name    = module.dns.name
+  vpc_id  = module.vpc.id
+  servers = coalesce(var.domain_name_servers, module.defaults.domain_name_servers)
 }
 
 module "dns" {
   source = "./dns"
-  name   = "${var.domain_name}"
-  vpc_id = "${module.vpc.id}"
-  region = "${var.region}"
+  name   = var.domain_name
+  vpc_id = module.vpc.id
+  region = var.region
 }
 
 module "iam_role" {
   source      = "./iam-role"
-  name        = "${var.name}"
-  environment = "${var.environment}"
+  name        = var.name
+  environment = var.environment
 }
 
 module "ecs_cluster" {
   source                 = "./ecs-cluster"
-  name                   = "${coalesce(var.ecs_cluster_name, var.name)}"
-  environment            = "${var.environment}"
-  vpc_id                 = "${module.vpc.id}"
-  image_id               = "${coalesce(var.ecs_ami, module.defaults.ecs_ami)}"
-  subnet_ids             = "${module.vpc.internal_subnets}"
-  key_name               = "${var.key_name}"
-  instance_type          = "${var.ecs_instance_type}"
-  instance_ebs_optimized = "${var.ecs_instance_ebs_optimized}"
-  iam_instance_profile   = "${module.iam_role.profile}"
-  min_size               = "${var.ecs_min_size}"
-  max_size               = "${var.ecs_max_size}"
-  desired_capacity       = "${var.ecs_desired_capacity}"
-  region                 = "${var.region}"
-  availability_zones     = "${module.vpc.availability_zones}"
-  docker_auth_type       = "${var.ecs_docker_auth_type}"
-  docker_auth_data       = "${var.ecs_docker_auth_data}"
-  security_groups        = "${concat(var.ecs_security_groups, list(module.security_groups.internal_ssh, module.security_groups.internal_elb, module.security_groups.external_elb))}"
-  cloud_config_custom    = "${var.cloud_config_custom}"
-  alarm_sns_topic        = "${var.alarm_sns_topic}"
+  name                   = coalesce(var.ecs_cluster_name, var.name)
+  environment            = var.environment
+  vpc_id                 = module.vpc.id
+  image_id               = coalesce(var.ecs_ami, module.defaults.ecs_ami)
+  subnet_ids             = module.vpc.internal_subnets
+  key_name               = var.key_name
+  instance_type          = var.ecs_instance_type
+  instance_ebs_optimized = var.ecs_instance_ebs_optimized
+  iam_instance_profile   = module.iam_role.profile
+  min_size               = var.ecs_min_size
+  max_size               = var.ecs_max_size
+  desired_capacity       = var.ecs_desired_capacity
+  region                 = var.region
+  availability_zones     = module.vpc.availability_zones
+  docker_auth_type       = var.ecs_docker_auth_type
+  docker_auth_data       = var.ecs_docker_auth_data
+  security_groups = concat(
+    var.ecs_security_groups,
+    [
+      module.security_groups.internal_ssh,
+      module.security_groups.internal_elb,
+      module.security_groups.external_elb,
+    ],
+  )
+  cloud_config_custom = var.cloud_config_custom
+  alarm_sns_topic     = var.alarm_sns_topic
 }
 
 module "s3_logs" {
   source      = "./s3-logs"
-  name        = "${var.name}"
-  environment = "${var.environment}"
-  account_id  = "${module.defaults.s3_logs_account_id}"
+  name        = var.name
+  environment = var.environment
+  account_id  = module.defaults.s3_logs_account_id
 }
 
 // The region in which the infra lives.
 output "region" {
-  value = "${var.region}"
+  value = var.region
 }
 
 // The bastion host IP.
 output "bastion_ip" {
-  value = "${module.bastion.external_ip}"
+  value = module.bastion.external_ip
 }
 
 // The internal route53 zone ID.
 output "zone_id" {
-  value = "${module.dns.zone_id}"
+  value = module.dns.zone_id
 }
 
 // Security group for internal ELBs.
 output "internal_elb" {
-  value = "${module.security_groups.internal_elb}"
+  value = module.security_groups.internal_elb
 }
 
 // Security group for external ELBs.
 output "external_elb" {
-  value = "${module.security_groups.external_elb}"
+  value = module.security_groups.external_elb
 }
 
 // Comma separated list of internal subnet IDs.
 output "internal_subnets" {
-  value = "${module.vpc.internal_subnets}"
+  value = module.vpc.internal_subnets
 }
 
 // Comma separated list of external subnet IDs.
 output "external_subnets" {
-  value = "${module.vpc.external_subnets}"
+  value = module.vpc.external_subnets
 }
 
 // ECS Service IAM role.
 output "iam_role" {
-  value = "${module.iam_role.arn}"
+  value = module.iam_role.arn
 }
 
 // S3 bucket ID for ELB logs.
 output "log_bucket_id" {
-  value = "${module.s3_logs.id}"
+  value = module.s3_logs.id
 }
 
 // The internal domain name, e.g "stack.local".
 output "domain_name" {
-  value = "${module.dns.name}"
+  value = module.dns.name
 }
 
 // The environment of the stack, e.g "prod".
 output "environment" {
-  value = "${var.environment}"
+  value = var.environment
 }
 
 // The default ECS cluster name.
 output "cluster" {
-  value = "${module.ecs_cluster.name}"
+  value = module.ecs_cluster.name
 }
 
 // The default ECS cluster name.
 output "cluster_arn" {
-  value = "${module.ecs_cluster.arn}"
+  value = module.ecs_cluster.arn
 }
 
 // The VPC availability zones.
 output "availability_zones" {
-  value = "${module.vpc.availability_zones}"
+  value = module.vpc.availability_zones
 }
 
 // The VPC security group ID.
 output "vpc_security_group" {
-  value = "${module.vpc.security_group}"
+  value = module.vpc.security_group
 }
 
 // The VPC ID.
 output "vpc_id" {
-  value = "${module.vpc.id}"
+  value = module.vpc.id
 }
 
 // The default ECS cluster security group ID.
 output "ecs_cluster_security_group_id" {
-  value = "${module.ecs_cluster.security_group_id}"
+  value = module.ecs_cluster.security_group_id
 }
 
 // Comma separated list of internal route table IDs.
 output "internal_route_tables" {
-  value = "${module.vpc.internal_rtb_id}"
+  value = module.vpc.internal_rtb_id
 }
 
 // The external route table ID.
 output "external_route_tables" {
-  value = "${module.vpc.external_rtb_id}"
+  value = module.vpc.external_rtb_id
 }
 
 output "cidr" {
-  value = "${var.cidr}"
+  value = var.cidr
 }
 
 output "iam_instance_profile" {
-  value = "${module.iam_role.profile}"
+  value = module.iam_role.profile
 }
 
 output "ecs_cluster_launch_configuration_user_data" {
-  value = "${module.ecs_cluster.launch_configuration_user_data}"
+  value = module.ecs_cluster.launch_configuration_user_data
 }
 
 output "name" {
-  value = "${var.name}"
+  value = var.name
 }
+

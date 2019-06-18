@@ -43,7 +43,7 @@ variable "image_id" {
 
 variable "subnet_ids" {
   description = "List of subnet IDs"
-  type        = "list"
+  type        = list(string)
 }
 
 variable "key_name" {
@@ -52,7 +52,7 @@ variable "key_name" {
 
 variable "security_groups" {
   description = "Comma separated list of security groups"
-  type = "list"
+  type        = list(string)
 }
 
 variable "iam_instance_profile" {
@@ -65,7 +65,7 @@ variable "region" {
 
 variable "availability_zones" {
   description = "List of AZs"
-  type        = "list"
+  type        = list(string)
 }
 
 variable "instance_type" {
@@ -112,18 +112,19 @@ variable "cloud_config_custom" {
   default     = ""
 }
 
-variable "alarm_sns_topic" {}
+variable "alarm_sns_topic" {
+}
 
 resource "aws_security_group" "cluster" {
   name        = "${var.name}-ecs-cluster"
-  vpc_id      = "${var.vpc_id}"
+  vpc_id      = var.vpc_id
   description = "Allows traffic from and to the EC2 instances of the ${var.name} ECS cluster"
 
   ingress {
     from_port       = 0
     to_port         = 0
     protocol        = -1
-    security_groups = ["${var.security_groups}"]
+    security_groups = var.security_groups
   }
 
   egress {
@@ -135,7 +136,7 @@ resource "aws_security_group" "cluster" {
 
   tags = {
     Name        = "ECS cluster (${var.name})"
-    Environment = "${var.environment}"
+    Environment = var.environment
   }
 
   lifecycle {
@@ -144,7 +145,7 @@ resource "aws_security_group" "cluster" {
 }
 
 resource "aws_ecs_cluster" "main" {
-  name = "${var.name}"
+  name = var.name
 
   lifecycle {
     create_before_destroy = true
@@ -152,29 +153,29 @@ resource "aws_ecs_cluster" "main" {
 }
 
 data "template_file" "cloud_config" {
-  template = "${file("${path.module}/files/cloud-config.yml.tpl")}"
+  template = file("${path.module}/files/cloud-config.yml.tpl")
 
   vars = {
-    environment      = "${var.environment}"
-    name             = "${var.name}"
-    region           = "${var.region}"
-    docker_auth_type = "${var.docker_auth_type}"
-    docker_auth_data = "${var.docker_auth_data}"
-    custom           = "${var.cloud_config_custom}"
+    environment      = var.environment
+    name             = var.name
+    region           = var.region
+    docker_auth_type = var.docker_auth_type
+    docker_auth_data = var.docker_auth_data
+    custom           = var.cloud_config_custom
   }
 }
 
 resource "aws_launch_configuration" "main" {
-  name_prefix = "${format("%s-", var.name)}"
+  name_prefix = format("%s-", var.name)
 
-  image_id                    = "${var.image_id}"
-  instance_type               = "${var.instance_type}"
-  ebs_optimized               = "${var.instance_ebs_optimized}"
-  iam_instance_profile        = "${var.iam_instance_profile}"
-  key_name                    = "${var.key_name}"
-  security_groups             = ["${aws_security_group.cluster.id}"]
-  user_data                   = "${data.template_file.cloud_config.rendered}"
-  associate_public_ip_address = "${var.associate_public_ip_address}"
+  image_id                    = var.image_id
+  instance_type               = var.instance_type
+  ebs_optimized               = var.instance_ebs_optimized
+  iam_instance_profile        = var.iam_instance_profile
+  key_name                    = var.key_name
+  security_groups             = [aws_security_group.cluster.id]
+  user_data                   = data.template_file.cloud_config.rendered
+  associate_public_ip_address = var.associate_public_ip_address
 
   lifecycle {
     create_before_destroy = true
@@ -186,31 +187,31 @@ resource "aws_launch_configuration" "main" {
 }
 
 resource "aws_autoscaling_group" "main" {
-  name = "${var.name}"
+  name = var.name
 
-  availability_zones   = ["${var.availability_zones}"]
-  vpc_zone_identifier  = ["${var.subnet_ids}"]
-  launch_configuration = "${aws_launch_configuration.main.id}"
-  min_size             = "${var.min_size}"
-  max_size             = "${var.max_size}"
-  desired_capacity     = "${var.desired_capacity}"
+  availability_zones   = var.availability_zones
+  vpc_zone_identifier  = var.subnet_ids
+  launch_configuration = aws_launch_configuration.main.id
+  min_size             = var.min_size
+  max_size             = var.max_size
+  desired_capacity     = var.desired_capacity
   termination_policies = ["OldestLaunchConfiguration", "Default"]
 
   tag {
     key                 = "Name"
-    value               = "${var.name}"
+    value               = var.name
     propagate_at_launch = true
   }
 
   tag {
     key                 = "Cluster"
-    value               = "${var.name}"
+    value               = var.name
     propagate_at_launch = true
   }
 
   tag {
     key                 = "Environment"
-    value               = "${var.environment}"
+    value               = var.environment
     propagate_at_launch = true
   }
 
@@ -224,7 +225,7 @@ resource "aws_autoscaling_policy" "scale_up" {
   scaling_adjustment     = 1
   adjustment_type        = "ChangeInCapacity"
   cooldown               = 300
-  autoscaling_group_name = "${aws_autoscaling_group.main.name}"
+  autoscaling_group_name = aws_autoscaling_group.main.name
 
   lifecycle {
     create_before_destroy = true
@@ -236,7 +237,7 @@ resource "aws_autoscaling_policy" "scale_down" {
   scaling_adjustment     = -1
   adjustment_type        = "ChangeInCapacity"
   cooldown               = 300
-  autoscaling_group_name = "${aws_autoscaling_group.main.name}"
+  autoscaling_group_name = aws_autoscaling_group.main.name
 
   lifecycle {
     create_before_destroy = true
@@ -253,12 +254,12 @@ resource "aws_cloudwatch_metric_alarm" "cpu_high" {
   statistic           = "Maximum"
   threshold           = "90"
 
-  dimensions {
-    ClusterName = "${aws_ecs_cluster.main.name}"
+  dimensions = {
+    ClusterName = aws_ecs_cluster.main.name
   }
 
   alarm_description = "Scale up if the cpu reservation is above 90% for 10 minutes"
-  alarm_actions     = ["${aws_autoscaling_policy.scale_up.arn}", "${var.alarm_sns_topic}"]
+  alarm_actions     = [aws_autoscaling_policy.scale_up.arn, var.alarm_sns_topic]
 
   lifecycle {
     create_before_destroy = true
@@ -275,12 +276,12 @@ resource "aws_cloudwatch_metric_alarm" "memory_high" {
   statistic           = "Maximum"
   threshold           = "90"
 
-  dimensions {
-    ClusterName = "${aws_ecs_cluster.main.name}"
+  dimensions = {
+    ClusterName = aws_ecs_cluster.main.name
   }
 
   alarm_description = "Scale up if the memory reservation is above 90% for 10 minutes"
-  alarm_actions     = ["${aws_autoscaling_policy.scale_up.arn}", "${var.alarm_sns_topic}"]
+  alarm_actions     = [aws_autoscaling_policy.scale_up.arn, var.alarm_sns_topic]
 
   lifecycle {
     create_before_destroy = true
@@ -288,7 +289,7 @@ resource "aws_cloudwatch_metric_alarm" "memory_high" {
 
   # This is required to make cloudwatch alarms creation sequential, AWS doesn't
   # support modifying alarms concurrently.
-  depends_on = ["aws_cloudwatch_metric_alarm.cpu_high"]
+  depends_on = [aws_cloudwatch_metric_alarm.cpu_high]
 }
 
 resource "aws_cloudwatch_metric_alarm" "cpu_low" {
@@ -301,12 +302,12 @@ resource "aws_cloudwatch_metric_alarm" "cpu_low" {
   statistic           = "Maximum"
   threshold           = "10"
 
-  dimensions {
-    ClusterName = "${aws_ecs_cluster.main.name}"
+  dimensions = {
+    ClusterName = aws_ecs_cluster.main.name
   }
 
   alarm_description = "Scale down if the cpu reservation is below 10% for 10 minutes"
-  alarm_actions     = ["${aws_autoscaling_policy.scale_down.arn}", "${var.alarm_sns_topic}"]
+  alarm_actions     = [aws_autoscaling_policy.scale_down.arn, var.alarm_sns_topic]
 
   lifecycle {
     create_before_destroy = true
@@ -314,7 +315,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_low" {
 
   # This is required to make cloudwatch alarms creation sequential, AWS doesn't
   # support modifying alarms concurrently.
-  depends_on = ["aws_cloudwatch_metric_alarm.memory_high"]
+  depends_on = [aws_cloudwatch_metric_alarm.memory_high]
 }
 
 resource "aws_cloudwatch_metric_alarm" "memory_low" {
@@ -327,12 +328,12 @@ resource "aws_cloudwatch_metric_alarm" "memory_low" {
   statistic           = "Maximum"
   threshold           = "10"
 
-  dimensions {
-    ClusterName = "${aws_ecs_cluster.main.name}"
+  dimensions = {
+    ClusterName = aws_ecs_cluster.main.name
   }
 
   alarm_description = "Scale down if the memory reservation is below 10% for 10 minutes"
-  alarm_actions     = ["${aws_autoscaling_policy.scale_down.arn}", "${var.alarm_sns_topic}"]
+  alarm_actions     = [aws_autoscaling_policy.scale_down.arn, var.alarm_sns_topic]
 
   lifecycle {
     create_before_destroy = true
@@ -340,24 +341,25 @@ resource "aws_cloudwatch_metric_alarm" "memory_low" {
 
   # This is required to make cloudwatch alarms creation sequential, AWS doesn't
   # support modifying alarms concurrently.
-  depends_on = ["aws_cloudwatch_metric_alarm.cpu_low"]
+  depends_on = [aws_cloudwatch_metric_alarm.cpu_low]
 }
 
 // The cluster name, e.g cdn
 output "name" {
-  value = "${var.name}"
+  value = var.name
 }
 
 // The cluster arn
 output "arn" {
-  value = "${aws_ecs_cluster.main.id}"
+  value = aws_ecs_cluster.main.id
 }
 
 // The cluster security group ID.
 output "security_group_id" {
-  value = "${aws_security_group.cluster.id}"
+  value = aws_security_group.cluster.id
 }
 
 output "launch_configuration_user_data" {
-  value = "${data.template_file.cloud_config.rendered}"
+  value = data.template_file.cloud_config.rendered
 }
+

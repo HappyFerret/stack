@@ -16,24 +16,22 @@ variable "zone_id" {
 
 variable "engine_version" {
   description = "The DB engine version"
-  default = "5.6.27"
+  default     = "5.6.27"
 }
-
-
 
 variable "security_groups" {
   description = "A list of security group IDs"
-  type = "list"
+  type        = list(string)
 }
 
 variable "subnet_ids" {
   description = "A list of subnet IDs"
-  type = "list"
+  type        = list(string)
 }
 
 variable "availability_zones" {
   description = "A list of availability zones"
-  type = "list"
+  type        = list(string)
 }
 
 variable "database_name" {
@@ -86,13 +84,13 @@ variable "port" {
 resource "aws_security_group" "main" {
   name        = "${var.name}-rds"
   description = "Allows traffic to rds from other security groups"
-  vpc_id      = "${var.vpc_id}"
+  vpc_id      = var.vpc_id
 
   ingress {
-    from_port       = "${var.port}"
-    to_port         = "${var.port}"
+    from_port       = var.port
+    to_port         = var.port
     protocol        = "TCP"
-    security_groups = ["${var.security_groups}"]
+    security_groups = var.security_groups
   }
 
   egress {
@@ -104,30 +102,31 @@ resource "aws_security_group" "main" {
 
   tags = {
     Name        = "RDS (${var.name})"
-    Environment = "${var.environment}"
+    Environment = var.environment
   }
 }
 
 resource "aws_db_subnet_group" "main" {
-  name        = "${var.name}"
+  name        = var.name
   description = "RDS subnet group"
-  subnet_ids  = ["${var.subnet_ids}"]
+  subnet_ids  = var.subnet_ids
 }
 
 resource "aws_db_instance" "main" {
-  allocated_storage    = 5
-  port                 = "${var.port}"
-  engine               = "mysql"
-  engine_version       = "${var.engine_version}"
-  instance_class       = "${var.instance_type}"
-  name                 = "${var.database_name}"
-  username             = "${var.master_username}"
-  password             = "${var.master_password}"
-  db_subnet_group_name = "${aws_db_subnet_group.main.id}"
-  parameter_group_name = "default.mysql5.6"
-  vpc_security_group_ids  = ["${aws_security_group.main.id}"]
+  allocated_storage      = 5
+  port                   = var.port
+  engine                 = "mysql"
+  engine_version         = var.engine_version
+  instance_class         = var.instance_type
+  name                   = var.database_name
+  username               = var.master_username
+  password               = var.master_password
+  db_subnet_group_name   = aws_db_subnet_group.main.id
+  parameter_group_name   = "default.mysql5.6"
+  vpc_security_group_ids = [aws_security_group.main.id]
+
   # availability_zone      = "eu-west-1a"
-  multi_az  = true
+  multi_az = true
 }
 
 # resource "aws_rds_cluster_instance" "cluster_instances" {
@@ -152,26 +151,27 @@ resource "aws_db_instance" "main" {
 # }
 
 resource "aws_route53_record" "main" {
-  zone_id = "${var.zone_id}"
-  name    = "${coalesce(var.dns_name, var.name)}"
+  zone_id = var.zone_id
+  name    = coalesce(var.dns_name, var.name)
   type    = "CNAME"
   ttl     = 300
-  records = ["${replace(aws_db_instance.main.endpoint, ":3306", "")}"]
+  records = [replace(aws_db_instance.main.endpoint, ":3306", "")]
 }
 
 // The cluster identifier.
 output "id" {
-  value = "${aws_db_instance.main.id}"
+  value = aws_db_instance.main.id
 }
 
 output "endpoint" {
-  value = "${replace(aws_db_instance.main.endpoint, ":3306", "")}"
+  value = replace(aws_db_instance.main.endpoint, ":3306", "")
 }
 
 output "fqdn" {
-  value = "${aws_route53_record.main.fqdn}"
+  value = aws_route53_record.main.fqdn
 }
 
 output "port" {
-  value = "${aws_db_instance.main.port}"
+  value = aws_db_instance.main.port
 }
+

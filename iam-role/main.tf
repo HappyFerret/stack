@@ -27,11 +27,12 @@ resource "aws_iam_role" "default_ecs_role" {
   ]
 }
 EOF
+
 }
 
 resource "aws_iam_role_policy" "default_ecs_service_role_policy" {
   name = "ecs-service-role-policy-${var.name}-${var.environment}"
-  role = "${aws_iam_role.default_ecs_role.id}"
+  role = aws_iam_role.default_ecs_role.id
 
   policy = <<EOF
 {
@@ -78,13 +79,14 @@ resource "aws_iam_role_policy" "default_ecs_service_role_policy" {
   ]
 }
 EOF
+
 }
 
 resource "aws_iam_role_policy" "default_ecs_instance_role_policy" {
-  name = "ecs-instance-role-policy-${var.name}-${var.environment}"
-  role = "${aws_iam_role.default_ecs_role.id}"
+name = "ecs-instance-role-policy-${var.name}-${var.environment}"
+role = aws_iam_role.default_ecs_role.id
 
-  policy = <<EOF
+policy = <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [
@@ -121,18 +123,20 @@ resource "aws_iam_role_policy" "default_ecs_instance_role_policy" {
   ]
 }
 EOF
+
 }
 
 resource "aws_iam_instance_profile" "default_ecs" {
-  name  = "ecs-instance-profile-${var.name}-${var.environment}"
-  path  = "/"
-  role = "${aws_iam_role.default_ecs_role.name}"
+name = "ecs-instance-profile-${var.name}-${var.environment}"
+path = "/"
+role = aws_iam_role.default_ecs_role.name
 }
 
 output "arn" {
-  value = "${aws_iam_role.default_ecs_role.arn}"
+value = aws_iam_role.default_ecs_role.arn
 }
 
 output "profile" {
-  value = "${aws_iam_instance_profile.default_ecs.id}"
+value = aws_iam_instance_profile.default_ecs.id
 }
+
