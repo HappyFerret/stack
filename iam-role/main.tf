@@ -106,7 +106,9 @@ policy = <<EOF
         "ecr:BatchGetImage",
         "ecs:StartTask",
         "autoscaling:*",
-        "secretsmanager:GetSecretValue"
+        "secretsmanager:GetSecretValue",
+        "s3:PutObject",
+        "s3:PutObjectAcl"
       ],
       "Resource": "*"
     },
