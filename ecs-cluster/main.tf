@@ -300,13 +300,13 @@ resource "aws_cloudwatch_metric_alarm" "cpu_low" {
   namespace           = "AWS/ECS"
   period              = "300"
   statistic           = "Maximum"
-  threshold           = "10"
+  threshold           = "5"
 
   dimensions = {
     ClusterName = aws_ecs_cluster.main.name
   }
 
-  alarm_description = "Scale down if the cpu reservation is below 10% for 10 minutes"
+  alarm_description = "Scale down if the cpu reservation is below 5% for 10 minutes"
   alarm_actions     = [aws_autoscaling_policy.scale_down.arn, var.alarm_sns_topic]
 
   lifecycle {
