@@ -173,6 +173,7 @@ module "bastion" {
   key_name        = var.key_name
   environment     = var.environment
   user_data       = var.bastion_user_data
+  role_name_prefix = var.bastion_default_role_name_prefix
 }
 
 module "dhcp" {
