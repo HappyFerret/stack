@@ -55,6 +55,10 @@ variable "user_data" {
   default     = ""
 }
 
+variable "bastion_default_role_name_prefix" {
+  default   = ""
+}
+
 resource "aws_instance" "bastion" {
   ami                    = "ami-09693313102a30b2c"
   source_dest_check      = false
@@ -77,8 +81,9 @@ resource "aws_eip" "bastion" {
   vpc      = true
 }
 
+
 resource "aws_iam_instance_profile" "default_bastion_role" {
-  name = "bastion-instance-profile-${var.environment}"
+  name = "${var.bastion_default_role_name_prefix}bastion-instance-profile-${var.environment}"
   path = "/"
   role = aws_iam_role.default_bastion_role.name
 }
