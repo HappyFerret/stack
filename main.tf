@@ -125,6 +125,10 @@ variable "bastion_user_data" {
   default     = ""
 }
 
+variable "bastion_default_role_name_prefix" {
+  default   = ""
+}
+
 variable "cloud_config_custom" {
   description = "Custom section to inject into cloud config"
   default     = ""
