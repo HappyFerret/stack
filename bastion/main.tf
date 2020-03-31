@@ -55,7 +55,7 @@ variable "user_data" {
   default     = ""
 }
 
-variable "role_name_prefix" {
+variable "name_prefix" {
   default   = ""
 }
 
@@ -83,13 +83,13 @@ resource "aws_eip" "bastion" {
 
 
 resource "aws_iam_instance_profile" "default_bastion_role" {
-  name = "bastion-instance-profile-${var.environment}"
+  name = "${var.name_prefix}bastion-instance-profile-${var.environment}"
   path = "/"
   role = aws_iam_role.default_bastion_role.name
 }
 
 resource "aws_iam_role" "default_bastion_role" {
-  name               = "${var.role_name_prefix}bastion-role-${var.environment}"
+  name               = "${var.name_prefix}bastion-role-${var.environment}"
   assume_role_policy = <<EOF
 {
   "Version": "2008-10-17",
