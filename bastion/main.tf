@@ -83,13 +83,13 @@ resource "aws_eip" "bastion" {
 
 
 resource "aws_iam_instance_profile" "default_bastion_role" {
-  name = "${var.role_name_prefix}bastion-instance-profile-${var.environment}"
+  name = "bastion-instance-profile-${var.environment}"
   path = "/"
   role = aws_iam_role.default_bastion_role.name
 }
 
 resource "aws_iam_role" "default_bastion_role" {
-  name               = "bastion-role-${var.environment}"
+  name               = "${var.role_name_prefix}bastion-role-${var.environment}"
   assume_role_policy = <<EOF
 {
   "Version": "2008-10-17",
