@@ -269,8 +269,12 @@ output "external_subnets" {
 }
 
 // ECS Service IAM role.
-output "iam_role" {
+output "iam_role_arn" {
   value = module.iam_role.arn
+}
+
+output "iam_role_name" {
+  value = module.iam_role.name
 }
 
 // S3 bucket ID for ELB logs.
