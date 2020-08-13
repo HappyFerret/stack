@@ -152,7 +152,8 @@ resource "aws_ecs_cluster" "main" {
   }
 
   setting {
-    containerInsights = "enabled"
+    name = "containerInsights"
+    value = "enabled"
   }
 }
 
