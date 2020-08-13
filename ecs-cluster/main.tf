@@ -150,6 +150,10 @@ resource "aws_ecs_cluster" "main" {
   lifecycle {
     create_before_destroy = true
   }
+
+  setting {
+    containerInsights = "enabled"
+  }
 }
 
 data "template_file" "cloud_config" {
