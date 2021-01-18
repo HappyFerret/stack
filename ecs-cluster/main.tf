@@ -63,11 +63,6 @@ variable "region" {
   description = "AWS Region"
 }
 
-variable "availability_zones" {
-  description = "List of AZs"
-  type        = list(string)
-}
-
 variable "instance_type" {
   description = "The instance type to use, e.g t2.small"
 }
@@ -194,7 +189,6 @@ resource "aws_launch_configuration" "main" {
 resource "aws_autoscaling_group" "main" {
   name = var.name
 
-  availability_zones   = var.availability_zones
   vpc_zone_identifier  = var.subnet_ids
   launch_configuration = aws_launch_configuration.main.id
   min_size             = var.min_size

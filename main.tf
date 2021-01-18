@@ -211,7 +211,6 @@ module "ecs_cluster" {
   max_size               = var.ecs_max_size
   desired_capacity       = var.ecs_desired_capacity
   region                 = var.region
-  availability_zones     = module.vpc.availability_zones
   docker_auth_type       = var.ecs_docker_auth_type
   docker_auth_data       = var.ecs_docker_auth_data
   security_groups = concat(
