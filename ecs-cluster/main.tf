@@ -182,7 +182,7 @@ resource "aws_launch_configuration" "main" {
   }
 
   root_block_device {
-    volume_size = 60
+    volume_size = 120
   }
 }
 
