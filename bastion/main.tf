@@ -60,7 +60,7 @@ variable "name_prefix" {
 }
 
 resource "aws_instance" "bastion" {
-  ami                    = "ami-09693313102a30b2c"
+  ami                    = "ami-0779c326801d5a843"
   source_dest_check      = false
   instance_type          = var.instance_type
   subnet_id              = var.subnet_id
