@@ -182,3 +182,6 @@ output "external_rtb_id" {
   value = aws_route_table.external.id
 }
 
+output "external_ips" {
+  value = flatten([aws_eip.nat.*.public_ip])
+}
